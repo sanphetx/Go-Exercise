@@ -27,5 +27,9 @@ func main() {
 	app.Put("/users/:id", handlers.UpdateUser)
 	app.Delete("/users/:id", handlers.DeleteUser)
 
+	app.Post("/auth/register", handlers.Register)
+	app.Post("/auth/login", handlers.Login)
+	app.Get("/auth/me", handlers.AuthMiddleware, handlers.GetCurrentUser)
+
 	log.Fatal(app.Listen(":3002"))
 }

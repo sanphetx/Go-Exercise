@@ -11,6 +11,7 @@ type User struct {
 	ID        uuid.UUID `gorm:"type:uuid;primary_key" json:"id"`
 	Name      string    `json:"name" validate:"required"`
 	Email     string    `gorm:"unique" json:"email" validate:"required,email"`
+	Password  string    `json:"password" validate:"required,min=6,containsany=ABCDEFGHIJKLMNOPQRSTUVWXYZ,containsany=abcdefghijklmnopqrstuvwxyz"`
 	Age       int       `json:"age" validate:"required,min=13"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

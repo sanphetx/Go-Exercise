@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/matthewhartstonge/argon2"
 )
 
 var validate = validator.New()
@@ -32,6 +33,17 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
+	// Hash password
+	argon := argon2.DefaultConfig()
+	hash, err := argon.HashEncoded([]byte(user.Password))
+	if err != nil {
+		log.Printf("Error hashing password: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Could not hash password",
+		})
+	}
+	user.Password = string(hash)
+
 	result := config.DB.Create(&user)
 	if result.Error != nil {
 		log.Printf("Database error: %v", result.Error)
@@ -41,6 +53,9 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	log.Printf("Successfully created user with ID: %s", user.ID)
+
+	// Don't return the password
+	user.Password = ""
 	return c.Status(fiber.StatusCreated).JSON(user)
 }
 
